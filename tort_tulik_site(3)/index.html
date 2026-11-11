@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Төрт түлік — тірі ойыншықтар</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky1:#7cc7ff; --sky2:#d9f1ff; --grass1:#8fd16a; --grass2:#5fae45;
+    --ink:#2b2340; --card:#fffaf0; --red:#d8343f; --gold:#f5b82e;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+    background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,#fff6dc 100%);
+    min-height:100%;overflow-x:hidden;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  /* ---------- scenery ---------- */
+  .scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .sun{position:absolute;top:6vh;right:8vw;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%,#fff6b0,#ffd23f 60%,#ffb703);
+    box-shadow:0 0 60px 20px rgba(255,210,63,.45);animation:sun 6s ease-in-out infinite}
+  @keyframes sun{50%{transform:scale(1.06)}}
+  .cloud{position:absolute;background:#fff;border-radius:60px;opacity:.95;filter:drop-shadow(0 6px 0 rgba(120,170,220,.25))}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .c1{top:9vh;left:-200px;width:150px;height:46px;animation:drift 48s linear infinite}
+  .c1::before{width:70px;height:70px;top:-34px;left:22px}.c1::after{width:52px;height:52px;top:-22px;left:80px}
+  .c2{top:22vh;left:-260px;width:200px;height:56px;animation:drift 70s linear infinite;animation-delay:-30s}
+  .c2::before{width:90px;height:90px;top:-46px;left:30px}.c2::after{width:66px;height:66px;top:-30px;left:110px}
+  @keyframes drift{to{transform:translateX(calc(100vw + 480px))}}
+  .hills{position:absolute;left:0;right:0;bottom:0;height:46vh}
+  /* ---------- layout ---------- */
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:18px 16px 40px}
+  header{text-align:center;margin:6px 0 4px}
+  h1{margin:0;font-weight:900;font-size:clamp(28px,6vw,46px);letter-spacing:.5px;color:#fff;
+     text-shadow:0 3px 0 #2f7fc1,0 6px 0 rgba(0,0,0,.12)}
+  .sub{margin:4px 0 0;font-weight:800;color:#24527a;font-size:clamp(14px,3.4vw,18px)}
+  .orn{display:block;margin:6px auto 0;width:180px;height:22px}
+  .main{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:12px;align-items:stretch}
+  @media (max-width:760px){.main{grid-template-columns:1fr}}
+  /* ---------- stage ---------- */
+  .stage{position:relative;height:clamp(330px,58vh,470px);border-radius:28px;
+    background:radial-gradient(ellipse at 50% 92%,rgba(255,255,255,.65),rgba(255,255,255,0) 60%);
+    touch-action:pan-y;cursor:grab;user-select:none;perspective:900px}
+  .stage:active{cursor:grabbing}
+  .shadow{position:absolute;left:50%;bottom:8%;width:58%;height:7%;transform:translateX(-50%);
+    background:radial-gradient(ellipse,rgba(40,60,30,.38),rgba(40,60,30,0) 70%);border-radius:50%}
+  .rig{position:absolute;left:50%;bottom:10%;width:78%;height:78%;transform:translateX(-50%);
+    transform-style:preserve-3d;display:flex;align-items:flex-end;justify-content:center}
+  .toy{max-width:100%;max-height:100%;object-fit:contain;transform-origin:50% 100%;
+    filter:drop-shadow(0 10px 10px rgba(0,0,0,.18)) drop-shadow(0 0 2px rgba(255,255,255,.9)) saturate(1.12) contrast(1.04);
+    will-change:transform;pointer-events:none}
+  .shine{position:absolute;inset:0;pointer-events:none;border-radius:28px;
+    background:radial-gradient(circle at var(--lx,30%) 20%,rgba(255,255,255,.35),rgba(255,255,255,0) 45%);mix-blend-mode:soft-light}
+  .bubble{position:absolute;top:4%;left:50%;transform:translate(-50%,10px) scale(.6);opacity:0;
+    background:#fff;border:4px solid var(--ink);border-radius:22px;padding:10px 18px;font-weight:900;
+    font-size:clamp(16px,3.6vw,21px);line-height:1.25;text-align:center;width:max-content;max-width:88%;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .2s;
+    box-shadow:0 6px 0 rgba(0,0,0,.12);z-index:3}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-16px;width:22px;height:22px;background:#fff;
+    border-right:4px solid var(--ink);border-bottom:4px solid var(--ink);transform:translateX(-50%) rotate(45deg)}
+  .bubble.on{opacity:1;transform:translate(-50%,0) scale(1)}
+  .bubble .w{opacity:.18;transition:opacity .15s,color .15s}
+  .bubble .w.on{opacity:1}
+  .bubble .w.now{color:var(--red)}
+  .bubble .tr{display:block;margin-top:4px;font-weight:700;font-size:.72em;color:#6b6385}
+  .hint{position:absolute;bottom:2%;left:0;right:0;text-align:center;font-weight:800;font-size:14px;color:#335;opacity:.75}
+  .fx{position:absolute;font-size:26px;pointer-events:none;z-index:2;animation:fly 1.3s ease-out forwards}
+  @keyframes fly{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:0}15%{opacity:1}
+    100%{transform:translate(var(--dx),-140px) scale(1.2) rotate(var(--r));opacity:0}}
+  .ctrl{position:absolute;right:12px;bottom:34px;display:flex;flex-direction:column;gap:8px;z-index:4}
+  .round{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;font-size:20px;
+    display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .1s}
+  .round:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+  .round.on{background:var(--gold)}
+  .dots{position:absolute;left:12px;top:14px;display:flex;gap:6px;z-index:4}
+  .dots i{width:10px;height:10px;border-radius:50%;background:rgba(43,35,64,.25);transition:.2s}
+  .dots i.on{background:var(--ink);transform:scale(1.25)}
+  /* ---------- info card ---------- */
+  .card{background:var(--card);border:4px solid var(--ink);border-radius:28px;padding:18px 18px 20px;
+    box-shadow:0 8px 0 var(--ink);display:flex;flex-direction:column;gap:12px}
+  .name{font-size:clamp(30px,6vw,40px);font-weight:900;margin:0;line-height:1}
+  .ru{font-weight:800;color:#6b6385;margin-top:-6px}
+  .talk{align-self:flex-start;border:4px solid var(--ink);background:var(--red);color:#fff;font:900 20px 'Nunito',sans-serif;
+    padding:10px 20px;border-radius:999px;cursor:pointer;box-shadow:0 5px 0 var(--ink);display:flex;gap:8px;align-items:center}
+  .talk:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+  .lbl{font-weight:900;font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:#8a6a1f;margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:5px 10px;font-weight:800;font-size:15px}
+  .fact{font-weight:700;font-size:15.5px;line-height:1.4;margin:0}
+  /* ---------- picker ---------- */
+  .picker{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+  .pick{border:4px solid var(--ink);border-radius:22px;background:#fff;padding:8px 6px 6px;cursor:pointer;
+    box-shadow:0 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;
+    font:900 16px 'Nunito',sans-serif;color:var(--ink);transition:transform .15s}
+  .pick img{height:64px;max-width:100%;object-fit:contain;transition:transform .3s}
+  .pick:hover img{transform:translateY(-4px) rotate(-4deg)}
+  .pick.on{background:var(--gold);transform:translateY(-4px)}
+  footer{margin-top:22px;text-align:center;font-weight:700;font-size:13px;color:#4a5a3a}
+  /* ---------- sections ---------- */
+  .sec{margin-top:26px;background:var(--card);border:4px solid var(--ink);border-radius:28px;box-shadow:0 8px 0 var(--ink);padding:20px 20px 24px}
+  .sec h2{margin:0 0 4px;font-weight:900;font-size:clamp(24px,5vw,32px)}
+  .sec .subh{margin:0 0 14px;font-weight:800;color:#6b6385}
+  .cartoon{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+  @media (max-width:760px){.cartoon{grid-template-columns:1fr}}
+  .cartoon video{width:100%;border-radius:22px;border:4px solid var(--ink);background:#000;display:block}
+  .note{font-size:13.5px;font-weight:700;color:#7a6f92;line-height:1.4}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+  .badge{border:3px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:900;font-size:14px;background:#fff}
+  .badge.lvl{background:var(--gold)}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr}}
+  .ph{width:100%;border-radius:18px;border:3px solid var(--ink);display:block;cursor:zoom-in;background:#fff}
+  .cap{font-size:13px;font-weight:800;color:#6b6385;text-align:center;margin:6px 0 0}
+  table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:15px;border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff}
+  table.t th{background:#ffe7a3;text-align:left;padding:8px 10px;font-weight:900}
+  table.t td{padding:7px 10px;border-top:2px solid #eee3c6;font-weight:700;vertical-align:top}
+  h3{font-weight:900;font-size:21px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  h3 .n{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:inline-grid;place-items:center;font-size:17px;border:3px solid var(--ink);flex:none}
+  ol.steps{margin:0;padding-left:22px;font-weight:700;line-height:1.5}
+  ol.steps li{margin:4px 0}
+  .tip{margin-top:10px;background:#e8f6ff;border:3px dashed #5aa9e6;border-radius:16px;padding:10px 14px;font-weight:700}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+  .gallery figure{margin:0}
+  .gallery img,.gallery video{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:3px solid var(--ink);display:block;cursor:zoom-in;background:#fff}
+  .gallery video{cursor:default}
+  .gallery figcaption{font-size:12.5px;font-weight:800;color:#6b6385;margin-top:4px;text-align:center}
+  .gh{display:inline-flex;align-items:center;gap:8px;margin-top:12px;border:3px solid var(--ink);border-radius:999px;padding:8px 16px;background:var(--red);color:#fff;font-weight:900;text-decoration:none;box-shadow:0 4px 0 var(--ink)}
+  .lb{position:fixed;inset:0;background:rgba(20,15,35,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}
+  .lb.on{display:flex}
+  .lb img{max-width:100%;max-height:100%;border-radius:12px;background:#fff}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .tabs button{border:3px solid var(--ink);border-radius:999px;background:#fff;font:900 15px 'Nunito',sans-serif;padding:6px 14px;cursor:pointer;color:var(--ink)}
+  .tabs button.on{background:var(--gold)}
+  .aname{font-size:clamp(30px,6vw,42px);font-weight:900;line-height:1}
+  .aname span{display:block;font-size:18px;color:#6b6385;font-weight:800;margin-top:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:5px 10px;font-weight:800;font-size:15px}
+  .lbl{font-weight:900;font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:#8a6a1f;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true">
+  <div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+  <svg class="hills" viewBox="0 0 1200 400" preserveAspectRatio="none">
+    <path d="M0 170 C200 90 380 160 560 120 C760 70 960 150 1200 100 L1200 400 L0 400Z" fill="#a9df83"/>
+    <path d="M0 240 C240 180 420 250 640 210 C860 170 1000 230 1200 200 L1200 400 L0 400Z" fill="#8fd16a"/>
+    <path d="M0 310 C260 270 520 330 760 300 C960 275 1080 300 1200 290 L1200 400 L0 400Z" fill="#6cbf4f"/>
+    <!-- юрта -->
+    <g transform="translate(1010 128) scale(.9)">
+      <path d="M0 60 L0 30 Q40 -6 80 30 L80 60Z" fill="#fff" stroke="#c9b48f" stroke-width="3"/>
+      <path d="M2 30 Q40 -4 78 30" fill="none" stroke="#d8343f" stroke-width="5"/>
+      <rect x="32" y="38" width="16" height="22" fill="#d8343f"/>
+    </g>
+  </svg>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>Төрт түлік</h1>
+    <p class="sub">Тірі ойыншықтар · Живые игрушки</p>
+    <svg class="orn" viewBox="0 0 180 22" aria-hidden="true">
+      <g fill="none" stroke="#d8343f" stroke-width="4" stroke-linecap="round">
+        <path d="M90 18 V10 M90 10 C90 2 78 2 78 9 C78 14 84 14 84 10 M90 10 C90 2 102 2 102 9 C102 14 96 14 96 10"/>
+        <path d="M70 11 H10 M110 11 H170"/>
+      </g>
+    </svg>
+  </header>
+
+  <nav class="picker" id="picker"></nav>
+
+  <section class="sec" id="cartoon-sec">
+    <h2>🎬 <span id="cTitle">Түйе</span> сөйлейді</h2>
+    <p class="subh">Мультфильм · Говорящий мультик</p>
+    <div class="cartoon">
+      <video id="cVideo" controls muted playsinline loop preload="metadata"></video>
+      <div class="ainfo">
+        <div class="aname" id="aName"></div>
+        <div class="lbl" style="margin-top:12px">Не береді? · Что даёт?</div>
+        <div class="chips" id="aChips"></div>
+        <p class="fact" id="aFact" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="sew">
+    <h2>🧵 Қалай тігеміз?</h2>
+    <p class="subh" id="sTitle">Как сшить: верблюд из фетра</p>
+    <div class="tabs" id="sTabs"></div>
+    <div class="badges" id="sBadges"></div>
+    <div class="grid2">
+      <figure style="margin:0"><img class="ph" id="sReal" alt=""><figcaption class="cap">Настоящая игрушка · Нағыз ойыншық</figcaption></figure>
+      <div>
+        <div class="lbl">Материалы · Материалдар</div>
+        <table class="t" id="sMat"></table>
+      </div>
+    </div>
+
+    <h3><span class="n">1</span>Лекала · Выкройка</h3>
+    <div class="grid2">
+      <figure style="margin:0"><img class="ph" id="sPattern" alt=""><figcaption class="cap">Нажмите, чтобы увеличить</figcaption></figure>
+      <div>
+        <p class="fact">Перенесите детали на бумагу <b>в натуральную величину</b> по указанным размерам и вырежьте шаблоны.</p>
+        <table class="t" id="sParts" style="margin-top:8px"></table>
+        <a class="gh dl" id="sGh" href="#" download target="_blank" rel="noopener">⬇ Скачать лекало</a>
+      </div>
+    </div>
+
+    <h3><span class="n">2</span>Вырезаем · Қиямыз</h3>
+    <ol class="steps" id="sCut"></ol>
+    <div class="tip" id="sTip"></div>
+
+    <h3><span class="n">3</span>Обмёточный шов · Тігіс</h3>
+    <ol class="steps">
+      <li>Выведите иглу на лицевую сторону у самого края детали.</li>
+      <li>Сделайте новый вкол на 3–4 мм дальше и проведите иглу под нитку, чтобы она легла петлёй по краю.</li>
+      <li>Затяните нитку не слишком туго и повторяйте по всей длине края.</li>
+    </ol>
+    <p class="fact" style="margin:10px 0 4px">Порядок работы:</p>
+    <ol class="steps" id="sStitch"></ol>
+
+    <h3><span class="n">4</span>Собираем · Құрастырамыз</h3>
+    <ol class="steps" id="sBuild"></ol>
+
+    <h3><span class="n">5</span><span id="sDecoT">Украшения</span></h3>
+    <ol class="steps" id="sDeco"></ol>
+    <ul class="steps" id="sFinal" style="margin-top:8px;font-weight:800"></ul>
+
+    <div class="lbl" style="margin-top:20px">Фото и видео процесса · Жұмыс барысы</div>
+    <div class="gallery" id="sGal"></div>
+  </section>
+  <footer>Ойыншықтар қолдан тігілген · «Зерде» жобасы · Мягкие игрушки нового поколения<br>Мультяшные изображения созданы с помощью ИИ</footer>
+  <div class="lb" id="lb"><img id="lbImg" alt=""></div>
+</div>
+
+<script>
+const ANIMALS = {
+  camel:{kk:'Түйе', ru:'Верблюд', hi:'Сәлем! Мен — түйемін. Мен адамдарға шұбат пен жүн беремін!', tr:'Привет! Я — верблюд. Я даю людям шұбат и шерсть!',
+    chips:['🥛 Шұбат','🧶 Жүн','🥩 Ет','🐫 Көлік'],
+    fact:'«Шөл кемесі». Ұзақ сапарға шыдамды. Пірі — Ойсыл қара. · «Корабль пустыни», пиром-покровителем считается Ойсыл қара.'},
+  horse:{kk:'Жылқы', ru:'Лошадь', hi:'Сәлем! Мен — жылқымын. Мен қымыз беремін, адамдарды алысқа апарамын!', tr:'Привет! Я — лошадь. Я даю қымыз и вожу людей далеко!',
+    chips:['🥛 Қымыз','🥩 Қазы-қарта','🏇 Мініс','🧵 Қыл'],
+    fact:'«Жылқы — ер қанаты». Пірі — Қамбар ата. · «Конь — крылья джигита», покровитель — Қамбар ата.'},
+  cow:{kk:'Сиыр', ru:'Корова', hi:'Сәлем! Мен — сиырмын. Мен сүт, айран, ірімшік беремін!', tr:'Привет! Я — корова. Я даю молоко, айран и ірімшік!',
+    chips:['🥛 Сүт','🥣 Айран','🧈 Сары май','🧀 Ірімшік, құрт'],
+    fact:'Сүтінен қаймақ, май, ірімшік жасайды. Пірі — Зеңгі баба. · Из молока делают сметану, масло, сыр; покровитель — Зеңгі баба.'},
+  sheep:{kk:'Қой', ru:'Овца', hi:'Сәлем! Мен — қоймын. Мен жүн беремін, одан киіз басады!', tr:'Привет! Я — овца. Я даю шерсть, из неё валяют войлок!',
+    chips:['🧶 Жүн, киіз','🥩 Ет','🧥 Тері','🌀 «Қошқар мүйіз»'],
+    fact:'Жүнінен киіз басады. «Қошқар мүйіз» оюы қойдың мүйізінен шыққан. Пірі — Шопан ата. · Из шерсти валяют войлок.'}
+};
+const ORDER=['camel','horse','cow','sheep'];
+const VIEWS=['front','right','back','left'];
+const $=id=>document.getElementById(id);
+let cur='camel';
+
+// ---------- picker ----------
+ORDER.forEach(a=>{
+  const b=document.createElement('button'); b.className='pick'; b.dataset.a=a;
+  b.innerHTML=`<img src="assets/${a}_right.webp" alt=""><span>${ANIMALS[a].kk}</span>`;
+  b.onclick=()=>{ select(a); const v=$('cVideo'); try{ v.currentTime=0; v.play().catch(()=>{}); }catch(e){} };
+  $('picker').appendChild(b);
+});
+function select(a){
+  cur=a;
+  document.querySelectorAll('.pick').forEach(p=>p.classList.toggle('on',p.dataset.a===a));
+  try{ history.replaceState(null,'','#'+a);}catch(e){}
+  if(typeof renderSew==='function') renderSew(a);
+}
+
+// ---------- sewing guides ----------
+const SEW = {
+  camel:{ru:'верблюд', level:'сложность выше средней',
+    mat:[['🟤 Коричневый фетр','Туловище, голова, ноги, уши'],['🟡 Жёлтый фетр','Попона'],['🟠 Красный или оранжевый фетр','Узор на попоне'],['🧶 Жёлтая пряжа или мулине','Три кисточки на попоне'],['🪢 Красный и жёлтый шнур','Скрученная уздечка'],['🔔 Маленький колокольчик','Украшение на шее'],['⚫ Серые или чёрные бусины','Глаза'],['🪡 Нитки мулине: коричневые, красные, жёлтые','Швы и вышивка'],['☁️ Синтепон или холлофайбер','Наполнитель']],
+    parts:[['Туловище с головой, горбами и двумя ногами','35 × 28 см','2'],['Деталь с двумя ногами (вставка между половинками)','22 × 20 см','2'],['Длинная вставка (спина, горбы и брюшко)','длина 72 см','1'],['Вставка поуже (голова и шея)','27 × 5 см','1'],['Клиновидная вставка','длина 14 см','2'],['Круги для подошв','⌀ 3 см','4'],['Круги для ушей','⌀ 2 см','2']],
+    cut:['Приколите бумажные шаблоны булавками к фетру и обведите их мелом или карандашом.','Вырежьте основные детали из коричневого фетра. Парные детали вырезайте так, чтобы они совпали по форме.','Сложите детали друг с другом и подровняйте края, чтобы они совпадали.','Из жёлтого фетра вырежьте прямоугольную попону по размеру спины игрушки.','Из красного фетра вырежьте завитки узора для попоны.'],
+    tip:'💡 Длинную вставку (72 см) удобнее вырезать из двух частей, а потом сшить в одну полосу на невидимом месте.',
+    stitch:['Пришейте красный узор на жёлтую попону, затем обшейте попону красными нитками по краю.','Обшейте круги для ушей и подошв.','Соедините детали туловища, оставив небольшое отверстие для набивки.'],
+    build:['Сложите две половины туловища лицевой стороной наружу и соедините их вставками.','Набейте игрушку наполнителем. Горбы, ноги и шею набивайте плотнее, чтобы верблюд устойчиво стоял.','Зашейте отверстие потайным швом.','Пришейте круги к низу ног — это подошвы.','Сложите круги для ушей пополам и пришейте по бокам головы.'],
+    decoT:'Попона и украшения',
+    deco:['Положите попону между горбами и пришейте по верхнему краю.','Внизу попоны подвесьте три жёлтые кисточки.','Скрутите красный и жёлтый шнур в жгут: сделайте уздечку на морде, второй кусок завяжите на шее.','Подвесьте колокольчик к шнуру на шее.','Для хвоста скрутите коричневые нитки в жгут, на конце сделайте кисточку и пришейте.'],
+    final:['Пришейте бусины-глаза или вышейте их.','Вышейте ноздри тёмной ниткой.','Готово! 🎉 Верблюд может отправляться в караван.'],
+    gal:[['img','sew/camel_templates.webp','Бумажные шаблоны и орнамент']]},
+  horse:{ru:'лошадка', level:'для начинающих',
+    mat:[['⚪ Белый или светло-серый фетр','Туловище, голова, ноги'],['🔴 Красный фетр','Попона (седло)'],['⚪ Белый фетр','Узор «қошқар мүйіз» на попоне'],['⚫ Чёрный фетр','Копыта'],['⚫ Чёрная пряжа или шнур','Грива и хвост'],['🎀 Красная тесьма с крестиками','Уздечка и подпруга'],['🪡 Нитки мулине: белые, красные, чёрные','Швы и вышивка'],['☁️ Синтепон или холлофайбер','Наполнитель']],
+    parts:[['Туловище с двумя ногами','22 × 32 см','2'],['Деталь с двумя ногами (вставка между половинками)','шир. 20 см, ноги 16 см','1'],['Голова и шея','28 × 8 см','1'],['Длинная боковая вставка','35 × 9 см','1'],['Полоса','22 × 4,5 см','1'],['Уши','2 см','2'],['Круги для копыт','⌀ 5 см','4']],
+    cut:['Приколите бумажные шаблоны булавками к фетру и обведите их мелом или карандашом.','Вырежьте детали из фетра. Парные детали вырезайте так, чтобы они совпали по форме.','Сложите детали друг с другом и подровняйте края.','Из красного фетра вырежьте попону.','Из белого фетра вырежьте узор «қошқар мүйіз» (бараньи рога) и пришейте его на попону.','Из чёрного фетра вырежьте детали копыт.'],
+    tip:'💡 Фетр не осыпается, поэтому края можно не подгибать. Но ножницы должны быть острыми, иначе края получатся рваными.',
+    stitch:['Вышейте красными нитками узор на попоне, затем окантовку.','Нашейте красную тесьму на голову (уздечка) и на туловище (подпруга).','Соедините детали туловища обмёточным швом, оставив отверстие для набивки.'],
+    build:['Сложите две половины туловища лицевой стороной наружу и соедините их вставками.','Набейте игрушку наполнителем. Ноги и шею набивайте плотнее, чтобы лошадка устойчиво стояла.','Зашейте отверстие потайным швом.','Пришейте чёрные круги к низу ног — это копыта.','Пришейте уши.'],
+    decoT:'Грива и хвост',
+    deco:['Нарежьте чёрную пряжу на пряди: для гривы покороче, для хвоста подлиннее.','Сложите каждую прядь пополам и пришейте петлёй вдоль шеи и в основании хвоста.','Распустите пряди, чтобы получилась пышная волнистая грива.'],
+    final:['Сделайте глаз из чёрной бусины или вышейте его.','Положите попону на спину и закрепите подпругу под животом.','Готово! 🎉 Лошадка может отправляться в путь.'],
+    gal:[['img','sew/horse_s1.webp','Шаг 1. Обводим шаблон на фетре'],['img','sew/horse_s2.webp','Шаг 2. Вырезаем детали'],['img','sew/horse_s3.webp','Шаг 3. Детали после раскроя'],['img','sew/horse_s4.webp','Шаг 4. Сшиваем'],['video','sew/horse_video.mp4','Видео: сшиваем детали']]},
+  cow:{ru:'коровка', level:'средняя сложность',
+    mat:[['⚫ Чёрный фетр','Туловище, голова, ноги, уши, хвост'],['⚪ Белый или кремовый фетр','Пятна и мордочка'],['🩶 Серый фетр','Рожки и копытца'],['🔵 Голубые бусины или фетр','Глаза'],['🪡 Нитки мулине: чёрные, белые, серые','Швы и вышивка'],['⚫ Чёрная пряжа','Кисточка на хвосте'],['☁️ Синтепон или холлофайбер','Наполнитель']],
+    parts:[['Туловище с двумя ногами (боковая деталь)','длина 42 см','2'],['Деталь с двумя ногами (вставка между половинками)','по чертежу','1'],['Длинная вставка (спина и брюшко)','по чертежу','1'],['Вставка поуже (голова и шея)','по чертежу','1'],['Круги для копыт','по чертежу','4'],['Уши','по чертежу','2'],['Рожки (треугольники)','по чертежу','2']],
+    cut:['Приколите бумажные шаблоны булавками к фетру и обведите их мелом или карандашом.','Вырежьте основные детали из чёрного фетра. Парные детали вырезайте так, чтобы они совпали по форме.','Сложите детали друг с другом и подровняйте края.','Из серого фетра вырежьте рожки и круги для копыт.','Из белого фетра вырежьте несколько пятен неправильной формы и мордочку.'],
+    tip:'💡 Пятна у каждой коровки свои. Сначала приложите бумажные заготовки к телу и подберите расположение, а потом вырезайте из фетра.',
+    stitch:['Пришейте белые пятна и мордочку к чёрным деталям белыми нитками.','Обшейте рожки и уши.','Соедините детали туловища, оставив отверстие для набивки.'],
+    build:['Сложите две половины туловища лицевой стороной наружу и соедините их вставками.','Набейте игрушку наполнителем. Ноги и шею набивайте плотнее, чтобы коровка устойчиво стояла.','Зашейте отверстие потайным швом.','Пришейте серые круги к низу ног — это копытца.'],
+    decoT:'Рожки, хвост и пятна',
+    deco:['Набейте рожки небольшим количеством наполнителя и пришейте их на макушку.','Пришейте уши по бокам головы, чуть ниже рожек.','Для хвоста заплетите чёрные нитки в жгут, на конце сделайте пушистую кисточку и пришейте.'],
+    final:['Пришейте голубые бусины-глаза или вышейте их.','Вышейте носик и ноздри тёмной ниткой на белой мордочке.','Готово! 🎉 Коровка может отправляться на луг.'],
+    gal:[['img','sew/cow_s1.webp','Шаг 1. Раскрой чёрного фетра'],['img','sew/cow_s2.webp','Шаг 2. Сшиваем'],['video','sew/cow_video.mp4','Видео: лекала коровы']]},
+  sheep:{ru:'овечка', level:'средняя сложность',
+    mat:[['🟤 Бежевый фетр','Мордочка, ноги, уши'],['⚪ Белый фетр','Кудрявая «шерсть» на теле'],['⚫ Чёрный фетр','Копытца'],['🔴 Красный фетр или лента','Ошейник'],['🟡 Жёлтые бусины или фетр','Глаза'],['🪡 Нитки мулине: бежевые, белые, чёрные, красные','Швы и вышивка'],['☁️ Синтепон или холлофайбер','Наполнитель']],
+    parts:[['Туловище с двумя ногами (боковая деталь)','7,5 × 6,5 см, нога 3,5 см','2'],['Деталь с двумя ногами (вставка)','3,5 × 6,5 см','1'],['Длинная вставка (голова и шея)','длина 11,5 см','1'],['Прямоугольник для копытец','4 × 2 см','4'],['Уши','овал 2 × 1 см','2']],
+    cut:['Приколите бумажные шаблоны булавками к фетру и обведите их мелом или карандашом.','Вырежьте детали: основу из бежевого фетра, копытца из чёрного.','Сложите детали друг с другом и подровняйте края.','Из белого фетра нарежьте много маленьких «облачков» диаметром 1,5–2,5 см — это будущие кудряшки.','Из красного фетра вырежьте полоску для ошейника.'],
+    tip:'💡 Чем больше кудряшек разного размера, тем пушистее получится овечка. Заготовьте их с запасом.',
+    stitch:['Обшейте края ушей и копытец.','Соедините детали туловища, головы и ног, оставив отверстие для набивки.'],
+    build:['Сложите две половины туловища лицевой стороной наружу и соедините их вставками.','Набейте игрушку наполнителем. Ноги и шею набивайте плотнее, чтобы овечка устойчиво стояла.','Зашейте отверстие потайным швом.','Оберните копытца вокруг нижней части ног и сшейте края.','Пришейте уши по бокам головы.'],
+    decoT:'Кудрявая шерсть',
+    deco:['Начните пришивать белые кудряшки с нижней части туловища и двигайтесь вверх.','Каждую кудряшку закрепляйте несколькими стежками по центру, а края оставляйте свободными.','Укладывайте кудряшки внахлёст, чтобы не осталось просветов.','На голове оставьте открытой мордочку, а на лбу сделайте «чёлку» из кудряшек.'],
+    final:['Пришейте жёлтые бусины-глаза или вышейте их.','Вышейте носик и ротик тёмной ниткой.','Завяжите или пришейте красный ошейник.','Готово! 🎉 Овечка может отправляться на пастбище.'],
+    gal:[['img','sew/sheep_templates.webp','Все шаблоны овечки'],['video','sew/sheep_video.mp4','Видео: лекала овечки']]}
+};
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function renderSew(a){
+  const S=SEW[a], A=ANIMALS[a];
+  $('cTitle').textContent=A.kk;
+  $('aName').innerHTML=`${esc(A.kk)} <span>${esc(A.ru)}</span>`;
+  $('aChips').innerHTML=A.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join('');
+  $('aFact').textContent=A.fact;
+  const v=$('cVideo'); if(v.dataset.a!==a){ v.dataset.a=a; v.src=`sew/${a}_talk.mp4`; v.poster=''; }
+  $('sTitle').textContent=`Как сшить: ${S.ru} из фетра`;
+  $('sTabs').innerHTML=ORDER.map(k=>`<button data-a="${k}" class="${k===a?'on':''}">${ANIMALS[k].kk}</button>`).join('');
+  $('sTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{select(b.dataset.a);});
+  $('sBadges').innerHTML=`<span class="badge lvl">${esc(S.level)}</span><span class="badge">фетр</span><span class="badge">обмёточный шов</span>`;
+  $('sReal').src=`sew/${a}_real.webp`; $('sReal').alt=`Настоящая игрушка — ${S.ru}`;
+  $('sMat').innerHTML='<tr><th>Материал</th><th>Для чего</th></tr>'+S.mat.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('');
+  $('sPattern').src=`sew/${a}_pattern.webp`; $('sPattern').alt=`Лекало — ${S.ru}`;
+  $('sParts').innerHTML='<tr><th>№</th><th>Деталь</th><th>Размер</th><th>Шт</th></tr>'+S.parts.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('');
+  $('sGh').href=`sew/${a}_lekalo.jpg`; $('sGh').setAttribute('download',`lekalo_${a}.jpg`);
+  const li=x=>x.map(t=>`<li>${esc(t)}</li>`).join('');
+  $('sCut').innerHTML=li(S.cut); $('sTip').textContent=S.tip; $('sStitch').innerHTML=li(S.stitch);
+  $('sBuild').innerHTML=li(S.build); $('sDecoT').textContent=S.decoT; $('sDeco').innerHTML=li(S.deco); $('sFinal').innerHTML=li(S.final);
+  $('sGal').innerHTML=S.gal.map(g=>g[0]==='img'
+    ? `<figure><img src="${g[1]}" alt="${esc(g[2])}" loading="lazy"><figcaption>${esc(g[2])}</figcaption></figure>`
+    : `<figure><video src="${g[1]}" muted loop playsinline controls preload="metadata"></video><figcaption>${esc(g[2])}</figcaption></figure>`).join('');
+}
+// download the lekalo: inside Claude through the downloads capability, elsewhere as a normal link
+$('sGh').addEventListener('click', async e=>{
+  const C=window.claude; if(!(C && typeof C.use==='function')) return;   // own hosting: plain link works
+  e.preventDefault();
+  const href=$('sGh').getAttribute('href'), name=$('sGh').getAttribute('download')||'lekalo.jpg';
+  const showImg=()=>{ $('lbImg').src=href; $('lb').classList.add('on'); };
+  try{
+    const dl=await C.use('downloads'); if(!dl){ showImg(); return; }
+    const blob=await (await fetch(href)).blob();
+    await dl.save({filename:name, data:blob});
+  }catch(err){ if(!err || err.code!=='declined') showImg(); }
+});
+// lightbox
+document.addEventListener('click',e=>{
+  const im=e.target.closest('.ph, .gallery img'); if(im){ $('lbImg').src=im.src; $('lb').classList.add('on'); return; }
+  if(e.target.closest('#lb')) $('lb').classList.remove('on');
+});
+// start on the animal in the URL hash (#camel, #horse, #cow, #sheep) — handy for one QR per toy
+const fromHash=(location.hash||'').slice(1);
+select(ANIMALS[fromHash]?fromHash:'camel');
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1); if(ANIMALS[h]&&h!==cur) select(h);});
+</script>
+</body>
+</html>
